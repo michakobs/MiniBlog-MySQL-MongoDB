@@ -6,7 +6,7 @@
 
 #header{
     position: fixed;
-    height: 120px;
+    height: 155px;
     padding: 0px;
     background-image: url("img/back.png");
     background-size: cover;
@@ -23,14 +23,42 @@
     background-color: rgba(0, 0, 0, 0.418);
     box-shadow: 0px -5px 5px rgba(0, 0, 0, 0.384);
 }
+#headerLogin{
+    display: flex;
+    justify-content: space-between;
+}
 .headline{
-    width: 100%;
+    width: 40%;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.8rem;
     font-weight: bold;
     color:white;
     margin: 20px 20px 30px 20px;
     text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.658);
+}
+#loginArea{
+    display: flex;
+    justify-content: flex-end;
+    width: 50%;
+    text-align: right;
+    padding: 10px;
+
+}
+#notify{
+    color: white;
+    font-weight: bold;
+    font-size: small;
+    text-align: center;
+}
+.butt{
+    color: white;
+    background-color: rgba(0, 0, 0, 0.253);
+    border: 0;
+    padding: 5px;
+}
+.butt:hover{
+    background-color: rgba(255, 0, 0, 0.568);
+    cursor: pointer;
 }
 .navbar, .navbar2{
     height: 80px;
@@ -38,6 +66,12 @@
     padding: 20px;
     margin:0;
 
+}
+#email, #password, #searchField{
+    background-color: rgba(255, 255, 255, 0.555);
+    border: 1px solid white;
+    margin: 5px;
+    padding: 5px;
 }
 .navbar2{
     text-align: right;
@@ -52,6 +86,7 @@
 .navlink:hover{
     font-style: italic;
     text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.658);
+    cursor: pointer;
 }
 .init{
     text-align: center;
@@ -122,6 +157,9 @@ a:hover, a:active{
     font-size: 0.8rem;
     color: rgba(0, 0, 0, 0.322);
     text-align: right;
+}
+.user{
+    font-weight: bold;
 }
 .manipulate{
     margin-top: 15px;

@@ -9,7 +9,33 @@
 </head>
 <body>
 <div id="header">
-    <div class='headline'>MyBlog - Personal Mini-Blog of Micha</div>
+    <div id="headerLogin">
+        <div class="headline">MyBlog - Personal Mini-Blog of Micha</div>
+        <div id="loginArea">
+            <table id="log">
+                <tr>
+                    <td>
+                        <input type="email" name="" id="email" placeholder="email">
+                        
+                    </td>
+                    <td>
+                        <input type="password" name="" id="password" placeholder = "password">
+                    </td>
+                </tr>
+                <tr>
+                    <td  id="notify">
+                        You need to log in!
+                    </td>
+                    <td>
+                        <button class="butt" id="login" onclick="login()">Log In</button>
+                        <button class="butt" id="logout" onclick="logout()">Log Out</button>
+                        <button class="butt" id="signup" onclick="signup()">Sign up</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
     <div class="nav">
         <div class='navbar'>
             <div id="navArticle" class="navlink">Artikel</div>
@@ -28,7 +54,7 @@
 </div>
 <div id="content">
     <div class='article' id='#'>
-        <div class="init">Wähle eine Datenbank!</div>
+        <div class="init">Log in and choose a databank!</div>
 
     </div>
     

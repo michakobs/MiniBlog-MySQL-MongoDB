@@ -1,29 +1,124 @@
+
+
 const articleBtn = document.getElementById('navArticle');
 const newArticleBtn = document.getElementById('newArticle');
 const contentArea = document.getElementById('content');
 const articleHeaderArea = document.getElementById('articleHeader');
 const articleContentArea = document.getElementById('articleContent');
-
 const articleInputArea = document.getElementById('articleInput');
 const headlineInputArea = document.getElementById('headlineInput');
 const articleTextInpArea = document.getElementById('articleTextInp');
 const articleUpdateArea = document.getElementById('articleUpdate');
-
 const sendTextBtn = document.getElementById('sendText');
-
 const mysqlBtn = document.getElementById('navMysql');
 const mongoBtn = document.getElementById('navMongoDB');
 
-let route = '';
+const emailField = document.getElementById('email')
+const passwordField = document.getElementById('password')
+const notifyField = document.getElementById('notify')
+const loginBtn = document.getElementById('login')
+const logoutBtn = document.getElementById('logout')
+const signupBtn = document.getElementById('signup')
 
-mysqlBtn.addEventListener("click", ()=>{
+let route = '';
+//------------login logout
+const login = async() => {
+    const userEmail = emailField.value;
+    const userPassword = passwordField.value;
+
+    const result = await fetch(`http://localhost:3000/login?email=${userEmail}&password=${userPassword}`);
+    const data = await result.text();
+    notifyField.innerHTML = data;
+    emailField.value = '';
+    passwordField.value = '';
+    initBlog(route);
+}
+
+const logout = async() => {
+    const result = await fetch(`http://localhost:3000/logout`);
+    const data = await result.json();
+
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Du hast dich erfolgreich ausgeloggt!</div></div>`;
+        notifyField.innerHTML = 'You need to log in!';
+        emailField.value = '';
+        passwordField.value = '';
+        route = '';
+    }
+    initBlog(route);
+}
+
+const signup = async() => {
+    const userEmail = emailField.value;
+    const userPassword = passwordField.value;
+    console.log(userEmail)
+    const result = await fetch(`http://localhost:3000/createAcc?email=${userEmail}&password=${userPassword}`);
+    const data = await result.text();
+    notifyField.innerHTML = data;
+    emailField.value = '';
+    passwordField.value = '';
+    initBlog(route);
+}
+//------------------------
+
+let authentication = async() => {
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return false;
+    }
+    return true;
+}
+
+(async() => {
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        route = '';
+        return;
+    }
+    notifyField.innerHTML = data.email;
+    emailField.value = '';
+    passwordField.value = '';
+    initBlog(route);
+})()
+
+mysqlBtn.addEventListener("click", async()=>{
+
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+    }    
     mysqlBtn.style.color = 'red';
     mongoBtn.style.color = 'white';
     route = 'blogposts';
     initBlog(route);
 }); 
 
-mongoBtn.addEventListener("click", ()=>{
+mongoBtn.addEventListener("click", async()=>{
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+        }    
     mongoBtn.style.color = 'red';
     mysqlBtn.style.color = 'white';
     route = 'mongoBlog';
@@ -31,6 +126,12 @@ mongoBtn.addEventListener("click", ()=>{
 }); 
 
 const initBlog = async(route) => {
+
+    if (route === '') {
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Wähle eine Datenbank!</div></div>`;
+        return;
+    }
     contentArea.style.display = "flex";
     articleInputArea.style.display = "none";
     articleUpdateArea.style.display = "none";   
@@ -45,18 +146,26 @@ const writeBlogData = (data) => {
     let articleHTML = ``;
     let dataID = 0;
     let date = '';
+    
     for(article of data){
-        articleHTML += `<div class='article' id='${article._id}'><div class="idfy">date: ${article.creationDate}</div><div class="idfy">ID#${article._id}</div>
+        console.log(article.email);
+        let user = article.email.split('@',1);
+        console.log(user);
+        articleHTML += `<div class='article' id='${article._id}'>
+        <div class="idfy user">user: ${user}</div>
+        <div class="idfy">date: ${article.creationDate}</div>
+        <div class="idfy">ID#${article._id}</div>
         <span class="idfy">title:</span><a id="articleHeader${article._id}" class='headerlink' href="#"> ${article.title}</a>
         <div id="articleContent${article._id}" class="articleContent">${article.content}</div>
         <div class="manipulate">
-        <button id='delete${article._id}' class="delBtn" onclick="deleteFunc('${article._id}')">delete</button>
+        <button id='delete${article._id}' class="delBtn" onclick="deleteById('${article._id}')">delete</button>
         <button id='update${article._id}' class="updBtn" onclick="updateFunc('${article._id}')">update</button>
         </div>
         </div>` 
 
     }
-    contentArea.innerHTML = articleHTML;  
+    contentArea.innerHTML = articleHTML; 
+    contentArea.scrollIntoView({block: "start", behavior: "smooth"}); 
 }
 
 
@@ -77,29 +186,55 @@ const updateFunc = (artid) => {
     document.getElementById('articleTextUpd').value = document.getElementById(`articleContent${artid}`).innerHTML;
 }
 
-const deleteFunc = (artid) => {
-    
-}
 
-articleBtn.addEventListener("click", ()=>{
+
+articleBtn.addEventListener("click", async()=>{
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+    }    
     contentArea.style.display = "flex";
     articleInputArea.style.display = "none";
 }); 
 
-newArticleBtn.addEventListener("click", ()=>{
+newArticleBtn.addEventListener("click",async()=>{
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+    }    
     contentArea.style.display = "none";
     articleInputArea.style.display = "flex";
 }); 
 
 sendTextBtn.onclick = async() => {
-    
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+        } 
     let newArticle = {
         title: `${headlineInputArea.value}`,
-        content: `${articleTextInpArea.value}`
+        content: `${articleTextInpArea.value}`,
+        email: `${data.email}`
     }
     let newArticleJSON = JSON.stringify(newArticle);
     //let newArticleJSON = newArticle.json()
 
+    console.table("newArticle");
     console.table(newArticle);
 
     try{
@@ -120,10 +255,20 @@ sendTextBtn.onclick = async() => {
 }
 
 const updateById = async(id) => {
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+    }    
     
     let newArticle = {
-        title: `${headlineInputArea.value}`,
-        content: `${articleTextInpArea.value}`
+        title: headlineUpdate.value,
+        content: articleTextUpd.value,
+        email: data.email
     }
     let newArticleJSON = JSON.stringify(newArticle);
     //let newArticleJSON = newArticle.json()
@@ -147,12 +292,43 @@ const updateById = async(id) => {
     initBlog(route);
 }
 
+const deleteById = async(id) => {
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        return;
+    }    
+
+    try{
+        await fetch(`http://localhost:3000/${route}/${id}`,
+            {
+                headers: {
+                    'Accept':'application/json',
+                    'Content-Type':'application/json'
+                },
+                method: "DELETE"
+            })
+        }
+        catch(e){
+            console.log('Error' + e);
+        }
+    initBlog(route);
+}
+
 
 let searchField = document.getElementById('searchField');
 
 
 let findInBlog = async() => {
     let searchStr = document.getElementById('searchField').value;
+    if(searchStr === ''){
+        initBlog(route);
+        return;
+    }
     console.log('FIND >> ' + route)
     console.log('searchStr: ' + searchStr)
     contentArea.style.display = "flex";
