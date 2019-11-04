@@ -6,7 +6,7 @@
 
 #header{
     position: fixed;
-    height: 155px;
+    height: 85px;
     padding: 0px;
     background-image: url("img/back.png");
     background-size: cover;
@@ -14,6 +14,7 @@
     background-repeat: no-repeat;
     width:100%;
     overflow: hidden;
+    transition: height 1s;
 }
 .nav{
     display: flex;

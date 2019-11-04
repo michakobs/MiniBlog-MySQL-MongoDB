@@ -21,6 +21,21 @@ const logoutBtn = document.getElementById('logout')
 const signupBtn = document.getElementById('signup')
 
 let route = '';
+
+const logInStyler = (status) => {
+    if(status === 0){
+        document.getElementById('header').style.height = '85px';
+        logoutBtn.style.display = 'none';
+        loginBtn.style.display = 'inline-block';
+        signupBtn.style.display = 'inline-block'
+    } else {
+        document.getElementById('header').style.height = '155px';
+        logoutBtn.style.display = 'inline-block';
+        loginBtn.style.display = 'none';
+        signupBtn.style.display = 'none'
+    }
+
+}
 //------------login logout
 const login = async() => {
     const userEmail = emailField.value;
@@ -31,6 +46,7 @@ const login = async() => {
     notifyField.innerHTML = data;
     emailField.value = '';
     passwordField.value = '';
+    logInStyler(1);
     initBlog(route);
 }
 
@@ -44,9 +60,11 @@ const logout = async() => {
         notifyField.innerHTML = 'You need to log in!';
         emailField.value = '';
         passwordField.value = '';
+        logInStyler(0);
         route = '';
+    }else{
+       initBlog(route); 
     }
-    initBlog(route);
 }
 
 const signup = async() => {
@@ -58,6 +76,7 @@ const signup = async() => {
     notifyField.innerHTML = data;
     emailField.value = '';
     passwordField.value = '';
+    logInStyler(1);
     initBlog(route);
 }
 //------------------------
@@ -70,8 +89,10 @@ let authentication = async() => {
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return false;
     }
+    logInStyler(1);
     return true;
 }
 
@@ -83,12 +104,14 @@ let authentication = async() => {
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         route = '';
         return;
     }
     notifyField.innerHTML = data.email;
     emailField.value = '';
     passwordField.value = '';
+    logInStyler(1);
     initBlog(route);
 })()
 
@@ -101,11 +124,13 @@ mysqlBtn.addEventListener("click", async()=>{
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
     }    
     mysqlBtn.style.color = 'red';
     mongoBtn.style.color = 'white';
     route = 'blogposts';
+    logInStyler(1);
     initBlog(route);
 }); 
 
@@ -117,11 +142,13 @@ mongoBtn.addEventListener("click", async()=>{
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
         }    
     mongoBtn.style.color = 'red';
     mysqlBtn.style.color = 'white';
     route = 'mongoBlog';
+    logInStyler(1);
     initBlog(route);
 }); 
 
@@ -159,7 +186,7 @@ const writeBlogData = (data) => {
         <div id="articleContent${article._id}" class="articleContent">${article.content}</div>
         <div class="manipulate">
         <button id='delete${article._id}' class="delBtn" onclick="deleteById('${article._id}')">delete</button>
-        <button id='update${article._id}' class="updBtn" onclick="updateFunc('${article._id}')">update</button>
+        <button id='update${article._id}' class="updBtn" onclick="updateFunc('${article._id}','${user}')">update</button>
         </div>
         </div>` 
 
@@ -170,7 +197,23 @@ const writeBlogData = (data) => {
 
 
 
-const updateFunc = (artid) => {
+const updateFunc = async(artid, user) => {
+
+    const result = await fetch(`http://localhost:3000/authentication`);
+    const data = await result.json();
+    console.log('authentication data=');
+    console.log(data);
+    if(data.email === ''){
+        contentArea.innerHTML = `<div class='article' id='#'>
+        <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
+        return;
+        } 
+    else if (data.email.split('@',1) != user){
+        alert('not your blogpost');
+        return;
+    }
+
     articleUpdateArea.style.display = "flex"; 
     contentArea.style.display = "none";
     articleInputArea.style.display = "none";
@@ -196,8 +239,10 @@ articleBtn.addEventListener("click", async()=>{
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
-    }    
+    }   
+    logInStyler(1); 
     contentArea.style.display = "flex";
     articleInputArea.style.display = "none";
 }); 
@@ -210,8 +255,10 @@ newArticleBtn.addEventListener("click",async()=>{
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
-    }    
+    }  
+    logInStyler(1);  
     contentArea.style.display = "none";
     articleInputArea.style.display = "flex";
 }); 
@@ -224,8 +271,10 @@ sendTextBtn.onclick = async() => {
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
         } 
+    logInStyler(1);
     let newArticle = {
         title: `${headlineInputArea.value}`,
         content: `${articleTextInpArea.value}`,
@@ -262,9 +311,10 @@ const updateById = async(id) => {
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
     }    
-    
+    logInStyler(1);
     let newArticle = {
         title: headlineUpdate.value,
         content: articleTextUpd.value,
@@ -300,8 +350,10 @@ const deleteById = async(id) => {
     if(data.email === ''){
         contentArea.innerHTML = `<div class='article' id='#'>
         <div class="init">Logge dich ein!</div></div>`;
+        logInStyler(0);
         return;
-    }    
+    } 
+    logInStyler(1);   
 
     try{
         await fetch(`http://localhost:3000/${route}/${id}`,
