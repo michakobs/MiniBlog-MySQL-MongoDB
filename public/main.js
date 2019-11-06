@@ -42,8 +42,12 @@ const login = async() => {
     const userPassword = passwordField.value;
 
     const result = await fetch(`http://localhost:3000/login?email=${userEmail}&password=${userPassword}`);
-    const data = await result.text();
-    notifyField.innerHTML = data;
+    const data = await result.json();
+    if(data.error === 1001){
+        notifyField.innerHTML = data.message;
+        return;
+    }
+    notifyField.innerHTML = data.message;
     emailField.value = '';
     passwordField.value = '';
     logInStyler(1);
@@ -72,8 +76,16 @@ const signup = async() => {
     const userPassword = passwordField.value;
     console.log(userEmail)
     const result = await fetch(`http://localhost:3000/createAcc?email=${userEmail}&password=${userPassword}`);
-    const data = await result.text();
-    notifyField.innerHTML = data;
+    const data = await result.json();
+    console.log('response= ' + data.error)
+    if(data.error === 1001){
+        notifyField.innerHTML = data.message;
+        return;
+    } else if(data.error === 1002){
+        notifyField.innerHTML = data.message;
+        return;
+    }
+    notifyField.innerHTML = data.message;
     emailField.value = '';
     passwordField.value = '';
     logInStyler(1);

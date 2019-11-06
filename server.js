@@ -1,4 +1,5 @@
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 
 const express = require('express');
 const app = express();
@@ -53,6 +54,36 @@ const PostSchema = new mongoose.Schema({
 
 
 const Post = mongoose.model('Post', PostSchema);
+//====================================================================================
+//Passwort hashing
+
+const getHash = (password) => {
+    return new Promise((resolve, reject) => {
+        console.log('hash password')
+        bcrypt.hash(password, 10, (err, res) => {
+            if(err) return reject(err);
+            console.log(`${password} = ${res}`)
+            return resolve(res);
+        });
+    });
+}
+
+let compareHash = (password, userHash) => {
+    return new Promise((resolve, reject) => {
+        console.log('compare password')
+        
+        bcrypt.compare(password, userHash, (err, resultCompare) => {
+            if(err) return reject(err);
+                if(resultCompare) {
+                    console.log('fit')
+                    return resolve(true);
+                }else{
+                    console.log('unfit')
+                    return resolve(false);
+                }
+            })
+    })
+}
 
 //=====================================================================================
 //Mongo authentication
@@ -101,25 +132,32 @@ createUser(seedData);
 
 app.get('/login', async(req,res)=>{
 
-    const searchQuery = { $and:[ 
-                                    {'email':req.query.email}, 
-                                    {'password':req.query.password} 
-                                ] };
-
+    console.log(`Login ==>> ${req.query.password}`)
+    
+    const searchQuery = {'email':req.query.email};
+    
     // const searchQuery = { email:req.query.email, password:req.query.password} 
     // funktioniert auch
     
-
-    let userFound = await User.find(searchQuery);  
+    
+    
+    let userFound = await User.find(searchQuery);
     console.log(userFound);
-    if(userFound[0]){
-        //console.log('found User: ' + userFound) 
-        req.session.email = req.query.email;
-        req.session.privilege = userFound[0].privilege;
-        console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
-        return res.send(`Hallo ${req.session.email}`)
+    if(userFound[0].email === req.query.email){
+        
+        let approved = await compareHash(req.query.password, userFound[0].password)
+        console.log('approval= ' + approved);
+        if(approved === true){
+            //console.log('found User: ' + userFound) 
+            req.session.email = req.query.email;
+            req.session.privilege = userFound[0].privilege;
+            console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
+            return res.send({'error':0, 'message':`Hallo ${req.session.email}`})
+        } else {
+            return res.send({'error':1002, 'message':`Wrong password!`});
+        }
     }else{
-        return res.send('Sign up for free!');
+        return res.send({'error':1001, 'message':`Sign up!`});
     }
 });
     
@@ -156,28 +194,38 @@ app.get('/logout', auth, (req,res)=>{
 
 app.get('/createAcc', async(req,res)=>{
 
+        if(!(req.query.email && req.query.password)){
+            return res.send({'error': 1001, 'message':'Email und Passwort angeben'})
+        }
+
+        let userHash = await getHash(req.query.password);
+        
+        console.log(`Sign up ==>> ${req.query.password} = ${userHash}`)
+
         let accountEPP = [
             {
                 email: req.query.email,
-                password: req.query.password,
+                password: userHash,
                 privilege: "guest"
             }
         ];
-    
+
         let userFound = await User.find({'email':req.query.email});
-    
-            if(userFound.length > 0){
-                    console.log(chalk.green.bold.inverse('email already exits'))
-                    return res.send('email already exists')
-            } else {
-                    await User.create(accountEPP);
-                    console.log(chalk.yellow.bold.inverse('Account created'))
-                    req.session.email = req.query.email;
-                    req.session.privilege = 'guest';
-                    console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
-                    return res.send(`Hallo ${req.session.email}`)
-            }
+        
+        if(userFound.length > 0){
+                console.log(chalk.green.bold.inverse('email already exits'))
+                return res.send({'error': 1002, 'message':'User exists'})
+        } else {
+                await User.create(accountEPP);
+                console.log(chalk.yellow.bold.inverse('Account created'))
+                req.session.email = req.query.email;
+                req.session.privilege = 'guest';
+                console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
+
+                return res.send({'error': 0, 'message':`Hallo ${req.session.email}`})
+        }
 })
+
 
 
 app.get('/content', authAdmin, (req, res) => { //auth wird ausgeführt, req wird erst weiterverarbeitet
