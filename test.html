@@ -1,0 +1,65 @@
+<html>
+                <head>
+                <title>Aktivierung abgeschlossen</title>
+                <!-- <meta http-equiv="refresh" content="50; URL=http://localhost:3000/"> -->
+                <style>
+                *{
+                    font-family: sans-serif;
+                }
+                .signupform{
+                    z-index: 1;
+                    position: fixed;
+                    top: 0;
+                    left:0;
+                    background-color: rgba(0, 0, 0, 0.507);
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .innersignupform{
+                    background-color: white;
+                    width: 50%;
+                    height: 50%;
+                    padding: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    border: 2px solid rgba(0, 0, 0, 0.226);
+                    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.233);
+                    border-radius: 5px;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .suh1{
+                    color: gray;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    margin: 20px;
+                    text-decoration: none;
+                }
+                .sup, a{
+                    color: gray;
+                    font-size: 0.9rem;
+                    margin: 20px;
+                    text-decoration: none;
+                }
+                a{
+                    color: rgb(68, 68, 255);
+                }      
+                </style>
+                </head>
+                <body>
+                    <div class="signupform" id="signupform">
+                        <div class="innersignupform">
+                        <h1 class="suh1">Dein Account wurde aktiviert.</h>
+                        <p class="sup">Du wirst in 5 Sekunden weitergeleitet.</p>
+                        <p class="sup">Falls nicht, klicke hier:</p>
+                        <p>
+                           <a href="https://localhost:3000/">https://localhost:3000/</a>
+                        </p>
+                        </div>
+                    </div>
+                </body>
+            </html>

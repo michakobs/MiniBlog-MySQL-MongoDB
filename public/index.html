@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,80 +8,101 @@
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
 </head>
+
 <body>
-<div id="header">
-    <div id="headerLogin">
-        <div class="headline">MyBlog - Personal Mini-Blog of Micha</div>
-        <div id="loginArea">
-            <table id="log">
-                <tr>
-                    <td>
-                        <input type="email" name="" id="email" placeholder="email">
-                        
-                    </td>
-                    <td>
-                        <input type="password" name="" id="password" placeholder = "password">
-                    </td>
-                </tr>
-                <tr>
-                    <td  id="notify">
-                        You need to log in!
-                    </td>
-                    <td>
-                        <button class="butt" id="login" onclick="login()">Log In</button>
-                        <button class="butt" id="logout" onclick="logout()">Log Out</button>
-                        <button class="butt" id="signup" onclick="signup()">Sign up</button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    
-    <div class="nav">
-        <div class='navbar'>
-            <div id="navArticle" class="navlink">Artikel</div>
-            <div id="newArticle" class="navlink">Neuen Artikel verfassen</div>
-            <div id="search" class="navlink">  Search: 
-                <input type="text" name="searchField" id="searchField">
+    <div id="header">
+        <div id="headerLogin">
+            <div class="headline">MyBlog - Personal Mini-Blog of Micha</div>
+            <div id="loginArea">
+                <table id="log">
+                    <tr>
+                        <td>
+                            <input type="email" name="" id="email" placeholder="email">
+
+                        </td>
+                        <td>
+                            <input type="password" name="" id="password" placeholder="password">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="notify">
+                            You need to log in!
+                        </td>
+                        <td>
+                            <button class="butt" id="login" onclick="login()">Log In</button>
+                            <button class="butt" id="logout" onclick="logout()">Log Out</button>
+                            <button class="butt" id="signup" onclick="signUpShow()">Sign up</button>
+                        </td>
+                    </tr>
+                </table>
             </div>
+        </div>
+
+        <div class="nav">
+            <div class='navbar'>
+                <div id="navArticle" class="navlink">Artikel</div>
+                <div id="newArticle" class="navlink">Neuen Artikel verfassen</div>
+                <div id="search" class="navlink"> Search:
+                    <input type="text" name="searchField" id="searchField">
+                </div>
+
+            </div>
+            <div class='navbar2'>
+                <div id="navMysql" class="navlink">MySQL</div>
+                <div id="navMongoDB" class="navlink">MongoDB</div>
+            </div>
+        </div>
+
+    </div>
+    <div id="content">
+        <div class='article' id='#'>
+            <div class="init">Log in and choose a databank!</div>
 
         </div>
-        <div class='navbar2'>
-            <div id="navMysql" class="navlink">MySQL</div>
-            <div id="navMongoDB" class="navlink">MongoDB</div>
+
+    </div>
+    <div id="articleInput">
+        <input type="text" name="" id="headlineInput">
+        <textarea name="articleTextInp" id="articleTextInp" cols="50" rows="20"></textarea>
+        <button id='sendText'>Publish</button>
+    </div>
+    <div id="articleUpdate">
+        <input type="text" name="" id="headlineUpdate"></input>
+        <textarea name="articleTextInp" id="articleTextUpd" cols="50" rows="20"></textarea>
+        <button id='updText'>Update</button>
+    </div>
+    <div class="signupform" id="signupform">
+
+        <div class="innersignupform">
+            <div class="abbrechen">
+                <button id="abbrechen">X</button>
+            </div>
+            <div id="innersignuparea">
+
+                <div>
+                    <table>
+                        <tr>
+                            <td>Email: </td>
+                            <td><input type="email" name="" id="suemail" placeholder="email"></td>
+                        </tr>
+                        <tr>
+                            <td>Passwort: </td>
+                            <td><input type="password" name="" id="supassword1" placeholder="password"></td>
+                        </tr>
+                        <tr>
+                            <td>Passwort (Wiederholung):</td>
+                            <td><input type="password" name="" id="supassword2" placeholder="password"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" id="notifySU">Bitte gib deine Email ein und wähle ein Passwort!</td>
+                        </tr>
+                    </table>
+                    <button class="butt butt2" id="signupformbutt" onclick="signUp()">Jetzt registrieren</button>
+                </div>
+            </div>
         </div>
     </div>
-    
-</div>
-<div id="content">
-    <div class='article' id='#'>
-        <div class="init">Log in and choose a databank!</div>
-
-    </div>
-    
-</div>
-<div id="articleInput">
-    <input type="text" name="" id="headlineInput">
-    <textarea name="articleTextInp" id="articleTextInp" cols="50" rows="20"></textarea>
-    <button id='sendText'>Publish</button>
-</div>
-<div id="articleUpdate">
-    <input type="text" name="" id="headlineUpdate"></input>
-    <textarea name="articleTextInp" id="articleTextUpd" cols="50" rows="20"></textarea>
-    <button id='updText'>Update</button>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-    
     <script src="main.js"></script>
 </body>
+
 </html>

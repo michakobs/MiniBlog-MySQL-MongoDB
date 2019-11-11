@@ -20,6 +20,17 @@ const loginBtn = document.getElementById('login')
 const logoutBtn = document.getElementById('logout')
 const signupBtn = document.getElementById('signup')
 
+const signUpForm = document.getElementById('signupform');
+const signUpAbbruch = document.getElementById('abbrechen')
+const signUpInpEmail = document.getElementById('suemail')
+const signUpInpPw1 = document.getElementById('supassword1')
+const signUpInpPw2 = document.getElementById('supassword2')
+const signupFormBtn = document.getElementById('signupformbutt')
+const signupFormNotify = document.getElementById('notifySU')
+const innerSignUpArea = document.getElementById('innersignuparea')
+
+
+
 let route = '';
 
 const logInStyler = (status) => {
@@ -71,9 +82,30 @@ const logout = async() => {
     }
 }
 
-const signup = async() => {
-    const userEmail = emailField.value;
-    const userPassword = passwordField.value;
+const signUp = async() => {
+
+    if(signUpInpEmail.value === ''){
+        signupFormNotify.innerHTML = "Das Email-Feld ist leer!"
+        return;
+    }
+    if(signUpInpEmail.value.split('@').length <2 || signUpInpEmail.value.split('@')[1].split('.').length <2){
+        signupFormNotify.innerHTML = "Das Email-Format stimmt nicht!"
+        return;
+    }
+    if(signUpInpPw1.value === '' || signUpInpPw2.value === ''){
+        signupFormNotify.innerHTML = "Gib dein Passwort zweimal ein!"
+        return;
+    }
+    if(signUpInpPw1.value != signUpInpPw2.value){
+        signupFormNotify.innerHTML = "Passwörter stimmen nicht überein!"
+        return;
+    }
+    const userEmail = signUpInpEmail.value;
+    const userPassword = signUpInpPw1.value;
+    innerSignUpArea.innerHTML = `<h1 class="suh1">Danke für deine Registrierung</h>
+    <p class="sup">Wir haben dir eine Email geschickt. Bitte gehe zu deinem Email-Account, öffne die Email und klicke den Link, um dich zu authentifizieren.</p>
+    <p class="sup">Nach erfolgreicher Authentifizierung kannst du dich mit deiner Email und deinem Passwort im MiniBlog einloggen.</p>`
+
     console.log(userEmail)
     const result = await fetch(`http://localhost:3000/createAcc?email=${userEmail}&password=${userPassword}`);
     const data = await result.json();
@@ -88,8 +120,8 @@ const signup = async() => {
     notifyField.innerHTML = data.message;
     emailField.value = '';
     passwordField.value = '';
-    logInStyler(1);
-    initBlog(route);
+    logInStyler(0);
+    //initBlog(route);
 }
 //------------------------
 
@@ -413,4 +445,14 @@ let findInBlog = async() => {
         writeBlogData(data);
     }
 }
+
+signUpAbbruch.addEventListener('click', () => {
+
+    signUpForm.style.display = "none";
+})
+
+let signUpShow = () => {
+    signUpForm.style.display = "flex";
+}
+
 searchField.addEventListener("change", findInBlog)

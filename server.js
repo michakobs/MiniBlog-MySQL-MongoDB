@@ -1,12 +1,13 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-
+const randomstring = require('randomstring');
 const express = require('express');
 const app = express();
 const mysql= require('mysql');
 const mongoose = require('mongoose');
 const User = require('./User');
 const chalk = require('chalk');
+const sendmail = require('./Mailer')
 
 //var bodyParser = require('body-parser')
  
@@ -199,13 +200,16 @@ app.get('/createAcc', async(req,res)=>{
         }
 
         let userHash = await getHash(req.query.password);
-        
+        const activationcode = randomstring.generate(20);
+
         console.log(`Sign up ==>> ${req.query.password} = ${userHash}`)
 
         let accountEPP = [
             {
                 email: req.query.email,
                 password: userHash,
+                activationcode: activationcode,
+                activate: '',
                 privilege: "guest"
             }
         ];
@@ -218,15 +222,108 @@ app.get('/createAcc', async(req,res)=>{
         } else {
                 await User.create(accountEPP);
                 console.log(chalk.yellow.bold.inverse('Account created'))
-                req.session.email = req.query.email;
-                req.session.privilege = 'guest';
-                console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
-
-                return res.send({'error': 0, 'message':`Hallo ${req.session.email}`})
+                //req.session.email = req.query.email;
+                //req.session.privilege = 'guest';
+                //console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
+                //return res.send({'error': 0, 'message':`Hallo ${req.session.email}`})
+                sendmail(req.query.email, 
+                    `MiniBlog Registrierung.`,
+                    `<h1> Danke für deine Registrierung auf MiniBlog!</h1>
+                    <p>Bitte klicke den folgenden Link, um dich zu authentifizieren.</p>
+                    <a href="http://localhost:3000/activate/${activationcode}">http://localhost:3000/activate/${activationcode}</a>`);
+                    return res.send({'error': 0, 'message':`Email an ${req.query.email} geschickt!`})
         }
 })
 
+app.get('/activate/:activationcode', async(req,res)=>{
+    let userFound = await User.find({'activationcode':req.params.activationcode});
+    
+    let date = Date.now();
+    let id = userFound._id;
+    console.log(chalk.red(id));
+    console.log(chalk.red(date));
+    if(userFound.length === 0){
+        console.log(chalk.green.bold.inverse('email already exits'))
+        return res.send({'error': 1003, 'message':'User not found'})
+    }else if (userFound.activate > 0){
+        return res.send({'error': 1004, 'message':'User already activated'})
+    } else {
+        console.log(chalk.yellow(userFound[0]._id));
+        await User.findOneAndUpdate({'activationcode':req.params.activationcode}, {$set:{activate: date}}, {new: true} )
 
+        req.session.email = userFound[0].email;
+        req.session.privilege = userFound[0].privilege;
+        console.log(chalk.red.inverse(req.session.email + '  ist angemeldet als  ' + req.session.privilege))
+        return res.send(
+            `<html>
+            <head>
+            <title>Aktivierung abgeschlossen</title>
+            <meta http-equiv="refresh" content="5; URL=http://localhost:3000/">
+            <style>
+            *{
+                font-family: sans-serif;
+            }
+            .signupform{
+                z-index: 1;
+                position: fixed;
+                top: 0;
+                left:0;
+                background-color: rgba(0, 0, 0, 0.507);
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            .innersignupform{
+                background-color: white;
+                width: 50%;
+                height: 50%;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                border: 2px solid rgba(0, 0, 0, 0.226);
+                box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.233);
+                border-radius: 5px;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .suh1{
+                color: gray;
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin: 20px;
+                text-decoration: none;
+            }
+            .sup, a{
+                color: gray;
+                font-size: 0.9rem;
+                margin: 20px;
+                text-decoration: none;
+            }
+            a{
+                color: rgb(68, 68, 255);
+            }      
+            </style>
+            </head>
+            <body>
+                <div class="signupform" id="signupform">
+                    <div class="innersignupform">
+                    <h1 class="suh1">Dein Account wurde aktiviert.</h>
+                    <p class="sup">Du wirst in 5 Sekunden weitergeleitet.</p>
+                    <p class="sup">Falls nicht, klicke hier:</p>
+                    <p>
+                       <a href="http://localhost:3000/">http://localhost:3000/</a>
+                    </p>
+                    </div>
+                </div>
+            </body>
+        </html>`
+        )
+        
+    }
+})
 
 app.get('/content', authAdmin, (req, res) => { //auth wird ausgeführt, req wird erst weiterverarbeitet
                                           //wenn auth next() ausführt
